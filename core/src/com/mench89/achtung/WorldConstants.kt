@@ -15,5 +15,9 @@ class WorldConstants private constructor() {
     const val LEVELS_FILE_PATH = "maps/"
 
     const val LOG_NAME = "Achtung die auto"
+
+    // Box2D uses radians for angle measurements so we want to be able to convert to angles.
+    const val DEGTORAD = 0.0174532925199432957f
+    const val RADTODEG = 57.295779513082320876f
   }
 }

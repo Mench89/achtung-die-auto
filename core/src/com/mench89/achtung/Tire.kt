@@ -36,7 +36,7 @@ class Tire(world: World) {
 
         body.userData = this
 
-        currentTraction = 1f
+        currentTraction = 2f
     }
 
     fun setCharacteristics(maxForwardSpeed: Float, maxBackwardSpeed: Float, maxDriveForce: Float, maxLateralImpulse: Float) {
@@ -48,7 +48,7 @@ class Tire(world: World) {
 
     fun updateTraction() {
         // TODO: Handle traction
-        currentTraction = 0.2f
+        currentTraction = 1f
     }
 
     fun getLeteralVelocity(): Vector2 {

@@ -6,3 +6,4 @@
 app/app.iml
 app/build/
 *.iml
+core/out/

@@ -11,6 +11,14 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import java.util.HashSet
 
+
+// TODO: Fix render loop sync.
+// TODO: Add four tires.
+// TODO: Add car.
+// TODO: Weapon
+// TODO: Collision
+// TODO: Map
+
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
         System.out.println("User pressed a key! " + keyCode)

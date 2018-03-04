@@ -1,6 +1,5 @@
 package com.mench89.achtung
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
@@ -13,8 +12,10 @@ class Tire(world: World) {
         RIGHT
     }
 
-    private val body: Body
+    val body: Body
     private var currentTraction: Float
+    private var currentDrag: Float
+
     private var maxForwardSpeed = 250f
     private var maxBackwardSpeed = -40f
     private var maxDriveForce = 500f
@@ -36,7 +37,8 @@ class Tire(world: World) {
 
         body.userData = this
 
-        currentTraction = 2f
+        currentTraction = 1f
+        currentDrag = 1f
     }
 
     fun setCharacteristics(maxForwardSpeed: Float, maxBackwardSpeed: Float, maxDriveForce: Float, maxLateralImpulse: Float) {
@@ -49,6 +51,7 @@ class Tire(world: World) {
     fun updateTraction() {
         // TODO: Handle traction
         currentTraction = 1f
+//        currentDrag
     }
 
     fun getLeteralVelocity(): Vector2 {
@@ -66,11 +69,11 @@ class Tire(world: World) {
     fun updateFiction() {
         // Lateral linear velocity
         // TODO: Kontrollera uträkning, har vänt negativitet på velocity och mass.
-        var impulse = getLeteralVelocity().scl(-body.mass)
+       /* var impulse = getLeteralVelocity().scl(-body.mass)
         if(impulse.len() > maxLateralImpulse) {
             impulse = impulse.scl(maxLateralImpulse / impulse.len())
         }
-        body.applyLinearImpulse(impulse.scl(currentTraction), body.worldCenter, true)
+        body.applyLinearImpulse(impulse.scl(currentTraction), body.worldCenter, true) */
 
         // Angular velocity
         // TODO: Konstant?
@@ -81,7 +84,8 @@ class Tire(world: World) {
         // TODO: Is this the same as normilzed?
         val currentForwardSpeed = currentForwardNormal.len()
         /// TODO: Konstant?
-        val dragForceMagnitude = currentForwardSpeed * -2f
+        var dragForceMagnitude = currentForwardSpeed * -0.25f
+        dragForceMagnitude *= currentDrag
         body.applyForce(currentForwardNormal.scl(currentTraction * dragForceMagnitude), body.worldCenter, true)
     }
 
@@ -103,14 +107,69 @@ class Tire(world: World) {
         if(desiredSpeed > currentSpeed) {
             force = maxDriveForce
         } else if (desiredSpeed < currentSpeed) {
-            force = -maxDriveForce
+            force = -maxDriveForce * 0.5f
         } else {
-            return
+            // Do nothing.
         }
 
-        body.applyForce(currentForwardNormal.scl(currentTraction * force), body.worldCenter, true)
+        //body.applyForce(currentForwardNormal.scl(currentTraction * force), body.worldCenter, true)
+        val speedFactor = currentSpeed / 120f
+        var driveImpulse = currentForwardNormal.scl((force / 60.0f))
+        if (driveImpulse.len() > maxLateralImpulse) {
+            driveImpulse = driveImpulse.scl(maxLateralImpulse / driveImpulse.len())
+        }
+
+        // TODO: Kontrollera uträkning, har vänt negativitet på velocity och mass.
+        val lateralFrictionImpulse = getLeteralVelocity().scl(-body.mass)
+        var laterImpulseAvailable = maxLateralImpulse
+        laterImpulseAvailable *= 2.0f * speedFactor
+        if(laterImpulseAvailable < 0.5f * maxLateralImpulse) {
+            laterImpulseAvailable = 0.5f * maxLateralImpulse
+        }
+        if (lateralFrictionImpulse.len() > laterImpulseAvailable) {
+            lateralFrictionImpulse.scl(laterImpulseAvailable / lateralFrictionImpulse.len())
+        }
+        //m_lastDriveImpulse = driveImpulse.Length();
+        //m_lastLateralFrictionImpulse = lateralFrictionImpulse.Length();
+
+        val impulse = Vector2(driveImpulse.x + lateralFrictionImpulse.x, driveImpulse.y + lateralFrictionImpulse.y)
+        if (impulse.len() > maxLateralImpulse) {
+            impulse.scl(maxLateralImpulse / impulse.len())
+        }
+        body.applyLinearImpulse(impulse.scl(currentTraction), body.worldCenter, true)
+
     }
 
+    /*
+
+        m_lastDriveImpulse = driveImpulse.Length();
+        m_lastLateralFrictionImpulse = lateralFrictionImpulse.Length();
+
+        b2Vec2 impulse = driveImpulse + lateralFrictionImpulse;
+        if ( impulse.Length() > m_maxLateralImpulse )
+            impulse *= m_maxLateralImpulse / impulse.Length();
+        m_body->ApplyLinearImpulse( m_currentTraction * impulse, m_body->GetWorldCenter() );
+
+        //wheelspin should be max at standstill, and zero at maximum speed
+        /*float topSpeed = 120;//estimated from playing around, not critical
+        float wsCurve = ( topSpeed - currentSpeed ) / topSpeed;
+        wheelspin *= 0.75f * wsCurve;
+
+        float lateralImpulseAvailable = m_maxLateralImpulse;
+        lateralImpulseAvailable -= wheelspin;
+        if ( lateralImpulseAvailable < 4 )
+            lateralImpulseAvailable = 4;
+        if ( lateralFrictionImpulse.Length() > lateralImpulseAvailable )
+            lateralFrictionImpulse *= lateralImpulseAvailable / lateralFrictionImpulse.Length();
+        m_body->ApplyLinearImpulse( m_currentTraction * lateralFrictionImpulse, m_body->GetWorldCenter() );
+
+
+        m_lastDriveImpulse = impulse.Length();
+        m_lastLateralFrictionImpulse = lateralFrictionImpulse.Length();*/
+     */
+
+
+    /*
     fun updateTurn(controlState: TireControlState) {
         var desiredTorque = 0f
         when (controlState) {
@@ -121,14 +180,7 @@ class Tire(world: World) {
         }
         body.applyTorque(desiredTorque, true)
     }
+    */
 
-    fun handleInput(keyCode: Int) {
-        when(keyCode) {
-            Input.Keys.UP -> updateDrive(TireControlState.UP)
-            Input.Keys.DOWN -> updateDrive(TireControlState.DOWN)
-            Input.Keys.LEFT -> updateTurn(TireControlState.LEFT)
-            Input.Keys.RIGHT -> updateTurn(TireControlState.RIGHT)
-            else -> {} // Don't handle.
-        }
-    }
+
 }

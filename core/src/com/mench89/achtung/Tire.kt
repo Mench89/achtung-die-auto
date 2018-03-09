@@ -30,7 +30,7 @@ class Tire(world: World) {
 
         val shape = PolygonShape()
         shape.setAsBox(0.5f, 1.25f)
-        body.setTransform(10f, 10f, 0f)
+        //body.setTransform(10f, 10f, 0f)
 
         val fixture = body.createFixture(shape, 1f) // Shape density
         // fixture->SetUserData( new CarTireFUD() );
@@ -83,19 +83,23 @@ class Tire(world: World) {
         val currentForwardNormal = getForwardVelocity()
         // TODO: Is this the same as normilzed?
         val currentForwardSpeed = currentForwardNormal.len()
+        System.out.println("Speed: " + currentForwardSpeed)
         /// TODO: Konstant?
         var dragForceMagnitude = currentForwardSpeed * -0.25f
         dragForceMagnitude *= currentDrag
         body.applyForce(currentForwardNormal.scl(currentTraction * dragForceMagnitude), body.worldCenter, true)
     }
 
-    fun updateDrive(controlState: TireControlState) {
+    fun updateDrive(controlStates: HashSet<TireControlState>) {
         // Find desired speed
         var desiredSpeed = 0f
-        when (controlState) {
-            TireControlState.UP -> desiredSpeed = maxForwardSpeed
-            TireControlState.DOWN -> desiredSpeed = maxBackwardSpeed
-            else -> {} // Do nothing.
+        for (controlState in controlStates) {
+            when (controlState) {
+                TireControlState.UP -> desiredSpeed = maxForwardSpeed
+                TireControlState.DOWN -> desiredSpeed = maxBackwardSpeed
+                else -> {
+                } // Do nothing.
+            }
         }
 
         // Find current speed in forward direction
@@ -104,12 +108,14 @@ class Tire(world: World) {
 
         // Apply necessary force
         var force = 0f
-        if(desiredSpeed > currentSpeed) {
-            force = maxDriveForce
-        } else if (desiredSpeed < currentSpeed) {
-            force = -maxDriveForce * 0.5f
-        } else {
-            // Do nothing.
+        if (controlStates.contains(TireControlState.UP) || controlStates.contains(TireControlState.DOWN)) {
+            if (desiredSpeed > currentSpeed) {
+                force = maxDriveForce
+            } else if (desiredSpeed < currentSpeed) {
+                force = -maxDriveForce * 0.5f
+            } else {
+                // Do nothing.
+            }
         }
 
         //body.applyForce(currentForwardNormal.scl(currentTraction * force), body.worldCenter, true)

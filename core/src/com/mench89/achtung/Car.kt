@@ -31,6 +31,7 @@ class Car(world: World) {
         Vector2(-1.5f, 0f))
         val polygonShape = PolygonShape()
         polygonShape.set(vertices)
+        val fixture = body.createFixture(polygonShape, 0.1f) //shape, density
 
         val jointDef = RevoluteJointDef()
         jointDef.bodyA = body
@@ -82,12 +83,12 @@ class Car(world: World) {
         tires.add(tire)
     }
 
-    fun update(controlState: Tire.TireControlState) {
+    fun update(controlStates: HashSet<Tire.TireControlState>) {
         for (tire in tires) {
             tire.updateFiction()
         }
         for (tire in tires) {
-            tire.updateDrive(controlState)
+            tire.updateDrive(controlStates)
         }
 
         // Control steering
@@ -96,10 +97,13 @@ class Car(world: World) {
         val turnPerTimeStep = turnSpeedPerSec / 60.0f
         var desiredAngle = 0f
 
-        when (controlState) {
-            Tire.TireControlState.LEFT -> desiredAngle = lockAngle
-            Tire.TireControlState.RIGHT -> desiredAngle = -lockAngle
-            else -> {} // Do noting
+        for (controlState in controlStates) {
+            when (controlState) {
+                Tire.TireControlState.LEFT -> desiredAngle = lockAngle
+                Tire.TireControlState.RIGHT -> desiredAngle = -lockAngle
+                else -> {
+                } // Do noting
+            }
         }
 
         val angleNow = frontLeftTireJoint.jointAngle

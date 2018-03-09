@@ -14,11 +14,13 @@ import java.util.HashSet
 
 
 // TODO: Fix render loop sync.
-// TODO: Add four tires.
-// TODO: Add car.
+// TODO: Add different cars.
+// TODO: Render car (with colors).
 // TODO: Weapon
 // TODO: Collision
 // TODO: Map
+// TODO: Handbrake support.
+// TODO: Add gravitation? Stop the car to be completely still.
 
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
@@ -65,7 +67,12 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         batch.end()
         debugRenderer.render(world, camera.combined)
 
-        pressedControlStates.forEach { car.update(it) }
+        car.update(pressedControlStates)
+        //pressedControlStates.forEach { car.update(it) }
+       /* if(pressedControlStates.size > 0) {
+            car.update(pressedControlStates.first())
+        }
+        */
     }
 
     fun controlStateOfKeyCode(keyCode: Int): Tire.TireControlState? {

@@ -53,7 +53,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         inputHandler = InputHandler(this)
         Gdx.input.inputProcessor = inputHandler
         debugRenderer = Box2DDebugRenderer()
-        camera = OrthographicCamera(100f,100f)
+        camera = OrthographicCamera(200f,200f)
         pressedControlStates = HashSet()
     }
 

@@ -1,10 +1,24 @@
 package com.mench89.achtung
 
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.PolygonRegion
+import com.badlogic.gdx.graphics.g2d.PolygonSprite
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
+import com.badlogic.gdx.math.Interpolation.circle
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
+import com.badlogic.gdx.math.EarClippingTriangulator
+import com.sun.tools.internal.xjc.reader.Ring.begin
+
+
 
 class Car(world: World) {
 
@@ -12,23 +26,40 @@ class Car(world: World) {
     private var tires: ArrayList<Tire>
     private var frontLeftTireJoint: RevoluteJoint
     private var frontRightTireJoint: RevoluteJoint
+    private val texture: Texture
+    private val polygonSprite: PolygonSprite
 
     init {
+
+
         val bodyDef = BodyDef()
         bodyDef.type = BodyDef.BodyType.DynamicBody
         body = world.createBody(bodyDef)
         // TODO: Need tweak?
         body.angularDamping = 3f
 
-        val vertices = arrayOf(
-        Vector2(1.5f, 0f),
-        Vector2(3f, 2.5f),
-        Vector2(2.8f, 5.5f),
-        Vector2(1f, 10f),
-        Vector2(-1f, 10f),
-        Vector2(-2.8f, 5.5f),
-        Vector2(-3f, 2.5f),
-        Vector2(-1.5f, 0f))
+        val vertices = floatArrayOf(
+        1.5f, 0f,
+        3f, 2.5f,
+        2.8f, 5.5f,
+        1f, 10f,
+        -1f, 10f,
+        -2.8f, 5.5f,
+        -3f, 2.5f,
+        -1.5f, 0f)
+
+        // Creating the color filling (but textures would work the same way)
+        val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pix.setColor(1f, 0f, 0f, 1f) // DE is red, AD is green and BE is blue.
+        pix.fill()
+        texture = Texture(pix)
+        val earClippingTriangulator = EarClippingTriangulator()
+        val shortArray = earClippingTriangulator.computeTriangles(vertices)
+        val polygonRegion = PolygonRegion(TextureRegion(texture), vertices, shortArray.items)
+        polygonSprite = PolygonSprite(polygonRegion)
+        // TODO: Set poly.origin?
+
+
         val polygonShape = PolygonShape()
         polygonShape.set(vertices)
         val fixture = body.createFixture(polygonShape, 0.1f) //shape, density
@@ -114,7 +145,34 @@ class Car(world: World) {
         frontRightTireJoint.setLimits(newAngle, newAngle)
     }
 
+    fun  draw(polySpriteBatch: PolygonSpriteBatch) {
+        polygonSprite.rotation = body.angle
+        polySpriteBatch.draw(polygonSprite, body.position.x, body.position.y)
+    }
+
     /*
+PolygonSprite poly;
+PolygonSpriteBatch polyBatch = new PolygonSpriteBatch(); // To assign at the beginning
+Texture textureSolid;
+
+// Creating the color filling (but textures would work the same way)
+Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+pix.setColor(0xDEADBEFF); // DE is red, AD is green and BE is blue.
+pix.fill();
+textureSolid = new Texture(pix);
+PolygonRegion polyReg = new PolygonRegion(new TextureRegion(textureSolid),
+  new float[] {      // Four vertices
+    0, 0,            // Vertex 0         3--2
+    100, 0,          // Vertex 1         | /|
+    100, 100,        // Vertex 2         |/ |
+    0, 100           // Vertex 3         0--1
+}, new short[] {
+    0, 1, 2,         // Two triangles using vertex indices.
+    0, 2, 3          // Take care of the counter-clockwise direction.
+});
+poly = new PolygonSprite(polyReg);
+poly.setOrigin(a, b);
+polyBatch = new PolygonSpriteBatch();
 
      */
 

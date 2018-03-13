@@ -1,5 +1,9 @@
 package com.mench89.achtung
 
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.*
+import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
@@ -20,6 +24,9 @@ class Tire(world: World) {
     private var maxBackwardSpeed = -40f
     private var maxDriveForce = 500f
     private var maxLateralImpulse = 8.5f
+
+    private val texture: Texture
+    private val sprite: Sprite
     // GroundAreaFUD *groundAreas.
 
     // TODO: Need a method or something to destruct the resources.
@@ -34,6 +41,15 @@ class Tire(world: World) {
 
         val fixture = body.createFixture(shape, 1f) // Shape density
         // fixture->SetUserData( new CarTireFUD() );
+
+        // Creating the color filling (but textures would work the same way)
+        val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pix.setColor(0f, 0f, 0f, 1f) // DE is red, AD is green and BE is blue.
+        pix.fill()
+        texture = Texture(pix)
+        sprite = Sprite(texture)
+        sprite.setSize(1f, 2.5f)
+        sprite.setOrigin( sprite.width/2, sprite.height/2)
 
         body.userData = this
 
@@ -144,6 +160,15 @@ class Tire(world: World) {
         }
         body.applyLinearImpulse(impulse.scl(currentTraction), body.worldCenter, true)
 
+    }
+
+    fun  draw(polySpriteBatch: PolygonSpriteBatch) {
+        sprite.setCenter(body.position.x, body.position.y)
+        sprite.rotation = body.angle * WorldConstants.RADTODEG
+        // TODO: Blir det rätt med .region?
+        //polySpriteBatch.draw(polygonSprite.region, body.position.x, body.position.y)
+        //
+        sprite.draw(polySpriteBatch)
     }
 
     /*

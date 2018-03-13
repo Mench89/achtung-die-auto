@@ -57,6 +57,7 @@ class Car(world: World) {
         val shortArray = earClippingTriangulator.computeTriangles(vertices)
         val polygonRegion = PolygonRegion(TextureRegion(texture), vertices, shortArray.items)
         polygonSprite = PolygonSprite(polygonRegion)
+        polygonSprite.setOrigin(0f, 0f)
         // TODO: Set poly.origin?
 
 
@@ -146,8 +147,15 @@ class Car(world: World) {
     }
 
     fun  draw(polySpriteBatch: PolygonSpriteBatch) {
-        polygonSprite.rotation = body.angle
-        polySpriteBatch.draw(polygonSprite, body.position.x, body.position.y)
+        polygonSprite.setPosition(body.position.x, body.position.y)
+
+        polygonSprite.rotation = body.angle * WorldConstants.RADTODEG
+        // TODO: Blir det rätt med .region?
+        //polySpriteBatch.draw(polygonSprite.region, body.position.x, body.position.y)
+        polygonSprite.draw(polySpriteBatch)
+        for (tire in tires) {
+            tire.draw(polySpriteBatch)
+        }
     }
 
     /*

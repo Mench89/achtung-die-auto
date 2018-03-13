@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
@@ -37,6 +38,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     lateinit var batch: SpriteBatch
+    lateinit var polygonSpriteBatch: PolygonSpriteBatch
     lateinit var img: Texture
     lateinit var inputHandler: InputHandler
     lateinit var world: World
@@ -47,26 +49,32 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
 
     override fun create() {
         batch = SpriteBatch()
+        polygonSpriteBatch = PolygonSpriteBatch()
         img = Texture("badlogic.jpg")
         world = World(Vector2(0f, 0f), true)
         car = Car(world)
         inputHandler = InputHandler(this)
         Gdx.input.inputProcessor = inputHandler
         debugRenderer = Box2DDebugRenderer()
-        camera = OrthographicCamera(200f,200f)
+        camera = OrthographicCamera(100f,100f)
         pressedControlStates = HashSet()
     }
 
     override fun render() {
+        batch.projectionMatrix = camera.combined
+        polygonSpriteBatch.projectionMatrix = camera.combined
 
-        world.step(1/20f,5, 5)
 
-        Gdx.gl.glClearColor(0f, 0f, 0.2f, 1f)
+        Gdx.gl.glClearColor(0f, 0.5f, 0.5f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         batch.begin()
         batch.end()
+        polygonSpriteBatch.begin()
+        car.draw(polygonSpriteBatch)
+        polygonSpriteBatch.end()
         debugRenderer.render(world, camera.combined)
 
+        world.step(1/20f,5, 5)
         car.update(pressedControlStates)
         //pressedControlStates.forEach { car.update(it) }
        /* if(pressedControlStates.size > 0) {
@@ -89,6 +97,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
 
     override fun dispose() {
         batch.dispose()
+        polygonSpriteBatch.dispose()
         img.dispose()
     }
 }

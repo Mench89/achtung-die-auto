@@ -3,6 +3,7 @@ package com.mench89.achtung
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -11,17 +12,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
-import java.util.HashSet
 
 
 // TODO: Fix render loop sync.
 // TODO: Add different cars.
-// TODO: Render car (with colors).
 // TODO: Weapon
 // TODO: Collision
 // TODO: Map
 // TODO: Handbrake support.
 // TODO: Add gravitation? Stop the car to be completely still.
+// TODO: Tweak steering, feels a little "slow"
+// TODO: Start position bug, wheels and car are rotating/spinning the first couple of frames.
 
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
@@ -43,6 +44,8 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     lateinit var inputHandler: InputHandler
     lateinit var world: World
     lateinit var car: Car
+    lateinit var car2: Car
+    lateinit var car3: Car
     lateinit var debugRenderer: Box2DDebugRenderer
     lateinit var camera: OrthographicCamera
     lateinit var pressedControlStates: HashSet<Tire.TireControlState>
@@ -53,6 +56,8 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         img = Texture("badlogic.jpg")
         world = World(Vector2(0f, 0f), true)
         car = Car(world)
+        car2 = Car(world, Color(1f, 1f, 0f, 1f),  Vector2(50f, 75f))
+        car3 = Car(world, Color(1f, 0f, 1f, 1f), Vector2(100f, 30f))
         inputHandler = InputHandler(this)
         Gdx.input.inputProcessor = inputHandler
         debugRenderer = Box2DDebugRenderer()
@@ -71,16 +76,17 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         batch.end()
         polygonSpriteBatch.begin()
         car.draw(polygonSpriteBatch)
+        car2.draw(polygonSpriteBatch)
+        car3.draw(polygonSpriteBatch)
         polygonSpriteBatch.end()
-        debugRenderer.render(world, camera.combined)
+        //debugRenderer.render(world, camera.combined)
 
-        world.step(1/20f,5, 5)
+        // TODO: Something is weird here
         car.update(pressedControlStates)
-        //pressedControlStates.forEach { car.update(it) }
-       /* if(pressedControlStates.size > 0) {
-            car.update(pressedControlStates.first())
-        }
-        */
+        world.step(1/20f,5, 5)
+        val emptyHashSet = HashSet<Tire.TireControlState>()
+        car2.update(emptyHashSet)
+        car2.update(emptyHashSet)
     }
 
     fun controlStateOfKeyCode(keyCode: Int): Tire.TireControlState? {

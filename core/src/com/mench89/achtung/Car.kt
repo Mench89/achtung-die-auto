@@ -7,20 +7,20 @@ import com.badlogic.gdx.graphics.g2d.PolygonRegion
 import com.badlogic.gdx.graphics.g2d.PolygonSprite
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.*
+import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.PolygonShape
+import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
-import com.badlogic.gdx.math.Interpolation.circle
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
-import com.badlogic.gdx.math.EarClippingTriangulator
-import com.sun.tools.internal.xjc.reader.Ring.begin
 
 
 
-class Car(world: World) {
+class Car(world: World, color: Color, position: Vector2) {
+    constructor(world: World) : this(world, Color(1f, 0f, 0f, 1f), Vector2(10f, 10f))
 
     private var body: Body
     private var tires: ArrayList<Tire>
@@ -33,6 +33,8 @@ class Car(world: World) {
 
 
         val bodyDef = BodyDef()
+        // Set start position
+        bodyDef.position.set(position)
         bodyDef.type = BodyDef.BodyType.DynamicBody
         body = world.createBody(bodyDef)
         // TODO: Need tweak?
@@ -50,7 +52,7 @@ class Car(world: World) {
 
         // Creating the color filling (but textures would work the same way)
         val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pix.setColor(1f, 0f, 0f, 1f) // DE is red, AD is green and BE is blue.
+        pix.setColor(color)
         pix.fill()
         texture = Texture(pix)
         val earClippingTriangulator = EarClippingTriangulator()
@@ -58,8 +60,6 @@ class Car(world: World) {
         val polygonRegion = PolygonRegion(TextureRegion(texture), vertices, shortArray.items)
         polygonSprite = PolygonSprite(polygonRegion)
         polygonSprite.setOrigin(0f, 0f)
-        // TODO: Set poly.origin?
-
 
         val polygonShape = PolygonShape()
         polygonShape.set(vertices)
@@ -87,7 +87,6 @@ class Car(world: World) {
         jointDef.bodyB = tire.body
         jointDef.localAnchorA.set(-3f, 0.75f)
         world.createJoint(jointDef)
-        //tires.add(tires.lastIndex, tire)
         tires.add(tire)
 
         // Back right tire
@@ -113,6 +112,7 @@ class Car(world: World) {
         jointDef.localAnchorA.set(3f, 8.75f)
         frontRightTireJoint = world.createJoint(jointDef) as RevoluteJoint
         tires.add(tire)
+
     }
 
     fun update(controlStates: HashSet<Tire.TireControlState>) {
@@ -133,8 +133,7 @@ class Car(world: World) {
             when (controlState) {
                 Tire.TireControlState.LEFT -> desiredAngle = lockAngle
                 Tire.TireControlState.RIGHT -> desiredAngle = -lockAngle
-                else -> {
-                } // Do noting
+                else -> { /* Do noting */ }
             }
         }
 
@@ -157,31 +156,4 @@ class Car(world: World) {
             tire.draw(polySpriteBatch)
         }
     }
-
-    /*
-PolygonSprite poly;
-PolygonSpriteBatch polyBatch = new PolygonSpriteBatch(); // To assign at the beginning
-Texture textureSolid;
-
-// Creating the color filling (but textures would work the same way)
-Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-pix.setColor(0xDEADBEFF); // DE is red, AD is green and BE is blue.
-pix.fill();
-textureSolid = new Texture(pix);
-PolygonRegion polyReg = new PolygonRegion(new TextureRegion(textureSolid),
-  new float[] {      // Four vertices
-    0, 0,            // Vertex 0         3--2
-    100, 0,          // Vertex 1         | /|
-    100, 100,        // Vertex 2         |/ |
-    0, 100           // Vertex 3         0--1
-}, new short[] {
-    0, 1, 2,         // Two triangles using vertex indices.
-    0, 2, 3          // Take care of the counter-clockwise direction.
-});
-poly = new PolygonSprite(polyReg);
-poly.setOrigin(a, b);
-polyBatch = new PolygonSpriteBatch();
-
-     */
-
 }

@@ -17,7 +17,6 @@ import com.badlogic.gdx.physics.box2d.World
 // TODO: Fix render loop sync.
 // TODO: Add different cars.
 // TODO: Weapon
-// TODO: Collision
 // TODO: Map
 // TODO: Handbrake support.
 // TODO: Add gravitation? Stop the car to be completely still.
@@ -49,6 +48,11 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     lateinit var debugRenderer: Box2DDebugRenderer
     lateinit var camera: OrthographicCamera
     lateinit var pressedControlStates: HashSet<Tire.TireControlState>
+    lateinit var walls: ArrayList<Wall>
+
+    val mapWidth = 150f
+    val mapHeight = 150f
+    val wallThickness = 2f
 
     override fun create() {
         batch = SpriteBatch()
@@ -56,13 +60,19 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         img = Texture("badlogic.jpg")
         world = World(Vector2(0f, 0f), true)
         car = Car(world)
-        car2 = Car(world, Color(1f, 1f, 0f, 1f),  Vector2(50f, 75f))
-        car3 = Car(world, Color(1f, 0f, 1f, 1f), Vector2(100f, 30f))
+        car2 = Car(world, Color(1f, 1f, 0f, 1f),  Vector2(40f, 20f))
+        car3 = Car(world, Color(1f, 0f, 1f, 1f), Vector2(-30f, -25f))
         inputHandler = InputHandler(this)
         Gdx.input.inputProcessor = inputHandler
         debugRenderer = Box2DDebugRenderer()
-        camera = OrthographicCamera(100f,100f)
+        camera = OrthographicCamera(150f,150f)
         pressedControlStates = HashSet()
+        walls = ArrayList()
+        walls.add(Wall(world, Vector2(-mapWidth/2 + (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))
+        walls.add(Wall(world, Vector2(0f,-mapHeight/2 + wallThickness/2), Vector2(mapWidth, wallThickness)))
+        walls.add(Wall(world, Vector2(+mapWidth/2 - (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))
+        walls.add(Wall(world, Vector2(0f,mapHeight/2 -wallThickness/2), Vector2(mapWidth, wallThickness)))
+
     }
 
     override fun render() {
@@ -78,6 +88,9 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         car.draw(polygonSpriteBatch)
         car2.draw(polygonSpriteBatch)
         car3.draw(polygonSpriteBatch)
+        for (wall in walls) {
+            wall.draw(polygonSpriteBatch)
+        }
         polygonSpriteBatch.end()
         //debugRenderer.render(world, camera.combined)
 

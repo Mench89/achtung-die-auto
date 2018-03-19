@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
@@ -26,7 +25,7 @@ import com.badlogic.gdx.physics.box2d.World
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
         System.out.println("User pressed a key! " + keyCode)
-        val controlState = controlStateOfKeyCode(keyCode)
+        val controlState = controlStateFromKeyCode(keyCode)
         if (controlState != null) {
             pressedControlStates.add(controlState)
         }
@@ -34,28 +33,26 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
 
     override fun onUserKeyUp(keyCode: Int) {
         System.out.println("User released a key! " + keyCode)
-        pressedControlStates.remove(controlStateOfKeyCode(keyCode))
+        pressedControlStates.remove(controlStateFromKeyCode(keyCode))
     }
 
-    lateinit var batch: SpriteBatch
-    lateinit var polygonSpriteBatch: PolygonSpriteBatch
-    lateinit var img: Texture
-    lateinit var inputHandler: InputHandler
-    lateinit var world: World
-    lateinit var car: Car
-    lateinit var car2: Car
-    lateinit var car3: Car
-    lateinit var debugRenderer: Box2DDebugRenderer
-    lateinit var camera: OrthographicCamera
-    lateinit var pressedControlStates: HashSet<Tire.TireControlState>
-    lateinit var walls: ArrayList<Wall>
+    private lateinit var polygonSpriteBatch: PolygonSpriteBatch
+    private lateinit var img: Texture
+    private lateinit var inputHandler: InputHandler
+    private lateinit var world: World
+    private lateinit var car: Car
+    private lateinit var car2: Car
+    private lateinit var car3: Car
+    private lateinit var debugRenderer: Box2DDebugRenderer
+    private lateinit var camera: OrthographicCamera
+    private lateinit var pressedControlStates: HashSet<Tire.TireControlState>
+    private lateinit var walls: ArrayList<Wall>
 
-    val mapWidth = 150f
-    val mapHeight = 150f
-    val wallThickness = 2f
+    private val mapWidth = 150f
+    private val mapHeight = 150f
+    private val wallThickness = 2f
 
     override fun create() {
-        batch = SpriteBatch()
         polygonSpriteBatch = PolygonSpriteBatch()
         img = Texture("badlogic.jpg")
         world = World(Vector2(0f, 0f), true)
@@ -76,14 +73,10 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     override fun render() {
-        batch.projectionMatrix = camera.combined
         polygonSpriteBatch.projectionMatrix = camera.combined
-
 
         Gdx.gl.glClearColor(0f, 0.5f, 0.5f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-        batch.begin()
-        batch.end()
         polygonSpriteBatch.begin()
         car.draw(polygonSpriteBatch)
         car2.draw(polygonSpriteBatch)
@@ -92,9 +85,9 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
             wall.draw(polygonSpriteBatch)
         }
         polygonSpriteBatch.end()
+        // Uncomment to show hit boxes.
         //debugRenderer.render(world, camera.combined)
 
-        // TODO: Something is weird here
         car.update(pressedControlStates)
         world.step(1/20f,5, 5)
         val emptyHashSet = HashSet<Tire.TireControlState>()
@@ -102,7 +95,12 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         car2.update(emptyHashSet)
     }
 
-    fun controlStateOfKeyCode(keyCode: Int): Tire.TireControlState? {
+    override fun dispose() {
+        polygonSpriteBatch.dispose()
+        img.dispose()
+    }
+
+    private fun controlStateFromKeyCode(keyCode: Int): Tire.TireControlState? {
         when(keyCode) {
             Input.Keys.UP -> return Tire.TireControlState.UP
             Input.Keys.DOWN -> return Tire.TireControlState.DOWN
@@ -112,11 +110,5 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         }
 
         return null
-    }
-
-    override fun dispose() {
-        batch.dispose()
-        polygonSpriteBatch.dispose()
-        img.dispose()
     }
 }

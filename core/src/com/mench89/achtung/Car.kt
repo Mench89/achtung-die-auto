@@ -17,8 +17,6 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
 
-
-
 class Car(world: World, color: Color, position: Vector2) {
     constructor(world: World) : this(world, Color(1f, 0f, 0f, 1f), Vector2(10f, 10f))
 
@@ -30,8 +28,6 @@ class Car(world: World, color: Color, position: Vector2) {
     private val polygonSprite: PolygonSprite
 
     init {
-
-
         val bodyDef = BodyDef()
         // Set start position
         bodyDef.position.set(position)
@@ -147,10 +143,7 @@ class Car(world: World, color: Color, position: Vector2) {
 
     fun  draw(polySpriteBatch: PolygonSpriteBatch) {
         polygonSprite.setPosition(body.position.x, body.position.y)
-
         polygonSprite.rotation = body.angle * WorldConstants.RADTODEG
-        // TODO: Blir det rätt med .region?
-        //polySpriteBatch.draw(polygonSprite.region, body.position.x, body.position.y)
         polygonSprite.draw(polySpriteBatch)
         for (tire in tires) {
             tire.draw(polySpriteBatch)

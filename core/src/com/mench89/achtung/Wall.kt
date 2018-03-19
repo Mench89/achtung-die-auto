@@ -23,25 +23,18 @@ class Wall(world: World, position: Vector2, size: Vector2) {
 
         val shape = PolygonShape()
         shape.setAsBox(size.x / 2, size.y / 2)
-        //body.setTransform(10f, 10f, 0f)
-        val fixture = body.createFixture(shape, 1f) // Shape density
+        body.createFixture(shape, 1f) // Shape density
 
-        // fixture->SetUserData( new CarTireFUD() );
-
-        // Creating the color filling (but textures would work the same way)
+        // Create the sprite
         val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pix.setColor(0.7f, 0.7f, 0f, 1f) // DE is red, AD is green and BE is blue.
+        pix.setColor(0.7f, 0.7f, 0f, 1f)
         pix.fill()
         sprite = Sprite(Texture(pix))
-        //sprite.setSize(size.x, size.y)
-        //sprite.setOrigin(0f, 0f)
-        //sprite.setSize(size.x, size.y)
         sprite.setBounds(position.x - (size.x / 2), position.y - (size.y / 2), size.x, size.y)
     }
 
 
     fun draw(spriteBatch: PolygonSpriteBatch) {
-       // sprite.setPosition(body.position.x, body.position.y)
         sprite.draw(spriteBatch)
     }
 

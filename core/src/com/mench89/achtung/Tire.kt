@@ -168,39 +168,8 @@ class Tire(world: World) {
     fun  draw(polySpriteBatch: PolygonSpriteBatch) {
         sprite.setCenter(body.position.x, body.position.y)
         sprite.rotation = body.angle * WorldConstants.RADTODEG
-        // TODO: Blir det rätt med .region?
-        //polySpriteBatch.draw(polygonSprite.region, body.position.x, body.position.y)
-        //
         sprite.draw(polySpriteBatch)
     }
-
-    /*
-
-        m_lastDriveImpulse = driveImpulse.Length();
-        m_lastLateralFrictionImpulse = lateralFrictionImpulse.Length();
-
-        b2Vec2 impulse = driveImpulse + lateralFrictionImpulse;
-        if ( impulse.Length() > m_maxLateralImpulse )
-            impulse *= m_maxLateralImpulse / impulse.Length();
-        m_body->ApplyLinearImpulse( m_currentTraction * impulse, m_body->GetWorldCenter() );
-
-        //wheelspin should be max at standstill, and zero at maximum speed
-        /*float topSpeed = 120;//estimated from playing around, not critical
-        float wsCurve = ( topSpeed - currentSpeed ) / topSpeed;
-        wheelspin *= 0.75f * wsCurve;
-
-        float lateralImpulseAvailable = m_maxLateralImpulse;
-        lateralImpulseAvailable -= wheelspin;
-        if ( lateralImpulseAvailable < 4 )
-            lateralImpulseAvailable = 4;
-        if ( lateralFrictionImpulse.Length() > lateralImpulseAvailable )
-            lateralFrictionImpulse *= lateralImpulseAvailable / lateralFrictionImpulse.Length();
-        m_body->ApplyLinearImpulse( m_currentTraction * lateralFrictionImpulse, m_body->GetWorldCenter() );
-
-
-        m_lastDriveImpulse = impulse.Length();
-        m_lastLateralFrictionImpulse = lateralFrictionImpulse.Length();*/
-     */
 
 
     /*

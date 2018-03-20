@@ -21,6 +21,9 @@ import com.badlogic.gdx.physics.box2d.World
 // TODO: Add gravitation? Stop the car to be completely still.
 // TODO: Tweak steering, feels a little "slow"
 // TODO: Start position bug, wheels and car are rotating/spinning the first couple of frames.
+// TODO: Add restart function for debugging
+// TODO: UI for showing score
+// TODO: Audio
 
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
@@ -28,6 +31,10 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         val controlState = controlStateFromKeyCode(keyCode)
         if (controlState != null) {
             pressedControlStates.add(controlState)
+        }
+
+        if (keyCode == Input.Keys.SPACE) {
+            bullets.add(Bullet(world, car.getPosition(), Vector2(1f, 3f), car.getAngle()))
         }
     }
 
@@ -47,6 +54,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     private lateinit var camera: OrthographicCamera
     private lateinit var pressedControlStates: HashSet<Tire.TireControlState>
     private lateinit var walls: ArrayList<Wall>
+    private lateinit var bullets: ArrayList<Bullet>
 
     private val mapWidth = 150f
     private val mapHeight = 150f
@@ -69,6 +77,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         walls.add(Wall(world, Vector2(0f,-mapHeight/2 + wallThickness/2), Vector2(mapWidth, wallThickness)))
         walls.add(Wall(world, Vector2(+mapWidth/2 - (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))
         walls.add(Wall(world, Vector2(0f,mapHeight/2 -wallThickness/2), Vector2(mapWidth, wallThickness)))
+        bullets = ArrayList()
 
     }
 
@@ -84,9 +93,12 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         for (wall in walls) {
             wall.draw(polygonSpriteBatch)
         }
+        for (bullet in bullets) {
+            bullet.draw(polygonSpriteBatch)
+        }
         polygonSpriteBatch.end()
         // Uncomment to show hit boxes.
-        //debugRenderer.render(world, camera.combined)
+        debugRenderer.render(world, camera.combined)
 
         car.update(pressedControlStates)
         world.step(1/20f,5, 5)

@@ -141,6 +141,14 @@ class Car(world: World, color: Color, position: Vector2) {
         frontRightTireJoint.setLimits(newAngle, newAngle)
     }
 
+    fun getPosition(): Vector2 {
+        return body.position
+    }
+
+    fun getAngle(): Float {
+        return body.angle
+    }
+
     fun  draw(polySpriteBatch: PolygonSpriteBatch) {
         polygonSprite.setPosition(body.position.x, body.position.y)
         polygonSprite.rotation = body.angle * WorldConstants.RADTODEG

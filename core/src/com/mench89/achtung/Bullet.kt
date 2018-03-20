@@ -25,18 +25,31 @@ class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
         shape.setAsBox(size.x / 2, size.y / 2)
         body.createFixture(shape, 1f) // Shape density
 
+        val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
+
+        //body.applyForce(currentForwardNormal.scl(10f), body.worldCenter, true)
+
         // Create the sprite
         val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pix.setColor(0.1f, 0.1f, 0.1f, 1f)
         pix.fill()
         sprite = Sprite(Texture(pix))
+        val correctedPosition = Vector2(body.position.x - (sprite.width / 2), body.position.y - (sprite.height / 2))
         sprite.setOriginCenter()
+        sprite.setBounds(correctedPosition.x, correctedPosition.y, size.x, size.y)
     }
 
     fun draw(spriteBatch: PolygonSpriteBatch) {
         val correctedPosition = Vector2(body.position.x - (sprite.width / 2), body.position.y - (sprite.height / 2))
+        sprite.setOriginCenter()
         sprite.setPosition(correctedPosition.x, correctedPosition.y)
         sprite.rotation = body.angle * WorldConstants.RADTODEG
         sprite.draw(spriteBatch)
+    }
+
+    fun getForwardVelocity(): Vector2 {
+        val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
+        // TODO: Kontrollera uträkning.
+        return currentForwardNormal.scl(currentForwardNormal.dot(body.linearVelocity))
     }
 }

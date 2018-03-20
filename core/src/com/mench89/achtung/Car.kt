@@ -145,6 +145,13 @@ class Car(world: World, color: Color, position: Vector2) {
         return body.position
     }
 
+    /**
+     * Get the position at the front of the car.
+     */
+    fun getNosePosition(): Vector2 {
+        return Vector2(body.position.x + 3, body.position.y + 5)
+    }
+
     fun getAngle(): Float {
         return body.angle
     }

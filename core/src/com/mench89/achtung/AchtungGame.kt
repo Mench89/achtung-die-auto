@@ -34,7 +34,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         }
 
         if (keyCode == Input.Keys.SPACE) {
-            bullets.add(Bullet(world, car.getPosition(), Vector2(1f, 3f), car.getAngle()))
+            bullets.add(Bullet(world, car.getNosePosition(), Vector2(1f, 3f), car.getAngle()))
         }
     }
 
@@ -56,8 +56,8 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     private lateinit var walls: ArrayList<Wall>
     private lateinit var bullets: ArrayList<Bullet>
 
-    private val mapWidth = 150f
-    private val mapHeight = 150f
+    private val mapWidth = 100f
+    private val mapHeight = 100f
     private val wallThickness = 2f
 
     override fun create() {
@@ -70,7 +70,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         inputHandler = InputHandler(this)
         Gdx.input.inputProcessor = inputHandler
         debugRenderer = Box2DDebugRenderer()
-        camera = OrthographicCamera(150f,150f)
+        camera = OrthographicCamera(mapWidth,mapHeight)
         pressedControlStates = HashSet()
         walls = ArrayList()
         walls.add(Wall(world, Vector2(-mapWidth/2 + (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))

@@ -26,6 +26,10 @@ class Car(world: World, color: Color, position: Vector2) {
     private var frontRightTireJoint: RevoluteJoint
     private val texture: Texture
     private val polygonSprite: PolygonSprite
+    // We can't use the width and height from the polygon sprite, it will always be 1, most likely because it contains
+    // a complex structure of vertices.
+    private val width = 6f
+    private val height = 10f
 
     init {
         val bodyDef = BodyDef()
@@ -149,7 +153,11 @@ class Car(world: World, color: Color, position: Vector2) {
      * Get the position at the front of the car.
      */
     fun getNosePosition(): Vector2 {
-        return Vector2(body.position.x + 3, body.position.y + 5)
+        val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
+        // Use the half height of the car to reach the front of the car, because we currently have the center point of the car.
+        val nosePoint = currentForwardNormal.scl(height/2)
+
+        return Vector2(body.worldCenter.x + nosePoint.x, body.worldCenter.y + nosePoint.y)
     }
 
     fun getAngle(): Float {

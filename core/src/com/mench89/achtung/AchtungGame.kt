@@ -98,7 +98,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         }
         polygonSpriteBatch.end()
         // Uncomment to show hit boxes.
-        debugRenderer.render(world, camera.combined)
+       // debugRenderer.render(world, camera.combined)
 
         car.update(pressedControlStates)
         world.step(1/20f,5, 5)

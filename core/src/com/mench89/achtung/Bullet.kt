@@ -23,11 +23,10 @@ class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
 
         val shape = PolygonShape()
         shape.setAsBox(size.x / 2, size.y / 2)
-        body.createFixture(shape, 1f) // Shape density
+        body.createFixture(shape, 2f) // Shape density
 
         val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
-
-        //body.applyForce(currentForwardNormal.scl(10f), body.worldCenter, true)
+        body.applyLinearImpulse(currentForwardNormal.scl(200f), body.worldCenter, true)
 
         // Create the sprite
         val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);

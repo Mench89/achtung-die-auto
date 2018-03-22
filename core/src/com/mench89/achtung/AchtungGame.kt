@@ -6,14 +6,12 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
 
 // TODO: Fix render loop sync.
-// TODO: Add different cars.
 // TODO: Weapon
 // TODO: Map
 // TODO: Handbrake support.
@@ -23,7 +21,8 @@ import com.badlogic.gdx.physics.box2d.*
 // TODO: Add restart function for debugging
 // TODO: UI for showing score
 // TODO: Audio
-// TODO: Add "death" state to car
+// TODO: Scoreboard UI
+// TODO: Multiplayer
 
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
@@ -50,6 +49,9 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
             // shooting car.
             bullets.add(Bullet(world, getNosePosition(car2.getBody(), (car2.getHeight() / 2) + 1 + (bulletHeight / 2)), Vector2(1f, bulletHeight), car2.getAngle()))
         }
+        if(keyCode == Input.Keys.P) {
+            resetWorld()
+        }
     }
 
     override fun onUserKeyUp(keyCode: Int) {
@@ -59,7 +61,6 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     private lateinit var polygonSpriteBatch: PolygonSpriteBatch
-    private lateinit var img: Texture
     private lateinit var inputHandler: InputHandler
     private lateinit var world: World
     private lateinit var car: Car
@@ -77,16 +78,24 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     private val wallThickness = 2f
 
     override fun create() {
+        initWorld()
         polygonSpriteBatch = PolygonSpriteBatch()
-        img = Texture("badlogic.jpg")
-        world = World(Vector2(0f, 0f), true)
-        car = Car(world)
-        car2 = Car(world, Color(1f, 1f, 0f, 1f),  Vector2(40f, 20f))
-        car3 = Car(world, Color(1f, 0f, 1f, 1f), Vector2(-30f, -25f))
         inputHandler = InputHandler(this)
         Gdx.input.inputProcessor = inputHandler
         debugRenderer = Box2DDebugRenderer()
         camera = OrthographicCamera(mapWidth,mapHeight)
+    }
+
+    private fun resetWorld() {
+        world.dispose()
+        initWorld()
+    }
+
+    private fun initWorld() {
+        world = World(Vector2(0f, 0f), true)
+        car = Car(world)
+        car2 = Car(world, Color(1f, 1f, 0f, 1f),  Vector2(40f, 20f))
+        car3 = Car(world, Color(1f, 0f, 1f, 1f), Vector2(-30f, -25f))
         pressedControlStates = HashSet()
         pressedControlStatesForCar2 = HashSet()
         walls = ArrayList()
@@ -130,7 +139,6 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
                 }
             }
         })
-
     }
 
     override fun render() {
@@ -171,8 +179,8 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     override fun dispose() {
+        world.dispose()
         polygonSpriteBatch.dispose()
-        img.dispose()
     }
 
     private fun controlStateFromKeyCode(keyCode: Int): Tire.TireControlState? {

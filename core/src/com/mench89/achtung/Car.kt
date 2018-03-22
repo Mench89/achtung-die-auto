@@ -83,6 +83,7 @@ class Car(world: World, color: Color, position: Vector2) {
 
         // Back left tire
         var tire = Tire(world)
+        tire.body.userData = this
         tire.setCharacteristics(maxForwardSpeed, maxBackwardSpeed, backTireMaxDriveForce, backTireMaxLateralImpulse)
         jointDef.bodyB = tire.body
         jointDef.localAnchorA.set(-3f, 0.75f)
@@ -91,6 +92,7 @@ class Car(world: World, color: Color, position: Vector2) {
 
         // Back right tire
         tire = Tire(world)
+        tire.body.userData = this
         tire.setCharacteristics(maxForwardSpeed, maxBackwardSpeed, backTireMaxDriveForce, backTireMaxLateralImpulse)
         jointDef.bodyB = tire.body
         jointDef.localAnchorA.set(3f, 0.75f)
@@ -99,6 +101,7 @@ class Car(world: World, color: Color, position: Vector2) {
 
         // Front left tire
         tire = Tire(world)
+        tire.body.userData = this
         tire.setCharacteristics(maxForwardSpeed, maxBackwardSpeed, frontTireMaxDriveForce, frontTireMaxLateralImpulse)
         jointDef.bodyB = tire.body
         jointDef.localAnchorA.set(-3f, 8.75f)
@@ -107,6 +110,7 @@ class Car(world: World, color: Color, position: Vector2) {
 
         // Front right tire
         tire = Tire(world)
+        tire.body.userData = this
         tire.setCharacteristics(maxForwardSpeed, maxBackwardSpeed, frontTireMaxDriveForce, frontTireMaxLateralImpulse)
         jointDef.bodyB = tire.body
         jointDef.localAnchorA.set(3f, 8.75f)
@@ -147,6 +151,14 @@ class Car(world: World, color: Color, position: Vector2) {
 
     fun getPosition(): Vector2 {
         return body.position
+    }
+
+    fun getBody(): Body {
+        return body
+    }
+
+    fun getHeight(): Float {
+        return height
     }
 
     /**

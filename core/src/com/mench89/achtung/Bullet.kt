@@ -11,6 +11,12 @@ import com.badlogic.gdx.physics.box2d.PolygonShape
 import com.badlogic.gdx.physics.box2d.World
 
 class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
+
+    /**
+     * Should be set true when this bullet object should be destroyed in next draw()-call.
+     */
+    var shouldDie = false
+
     private val sprite: Sprite
     private val body: Body
 
@@ -24,6 +30,7 @@ class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
         val shape = PolygonShape()
         shape.setAsBox(size.x / 2, size.y / 2)
         body.createFixture(shape, 2f) // Shape density
+        body.userData = this
 
         val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
         body.applyLinearImpulse(currentForwardNormal.scl(200f), body.worldCenter, true)
@@ -46,9 +53,7 @@ class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
         sprite.draw(spriteBatch)
     }
 
-    fun getForwardVelocity(): Vector2 {
-        val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
-        // TODO: Kontrollera uträkning.
-        return currentForwardNormal.scl(currentForwardNormal.dot(body.linearVelocity))
+    fun destroy(world: World) {
+        world.destroyBody(body)
     }
 }

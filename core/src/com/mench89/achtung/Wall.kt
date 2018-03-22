@@ -24,6 +24,7 @@ class Wall(world: World, position: Vector2, size: Vector2) {
         val shape = PolygonShape()
         shape.setAsBox(size.x / 2, size.y / 2)
         body.createFixture(shape, 1f) // Shape density
+        body.userData = this
 
         // Create the sprite
         val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);

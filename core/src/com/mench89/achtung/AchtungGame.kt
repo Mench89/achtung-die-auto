@@ -28,22 +28,34 @@ import com.badlogic.gdx.physics.box2d.*
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
         System.out.println("User pressed a key! " + keyCode)
-        val controlState = controlStateFromKeyCode(keyCode)
+        var controlState = controlStateFromKeyCode(keyCode)
         if (controlState != null) {
             pressedControlStates.add(controlState)
         }
+        // Only for test
+        controlState = controlStateFromKeyCodeForTest(keyCode)
+        if (controlState != null) {
+            pressedControlStatesForCar2.add(controlState)
+        }
 
-        if (keyCode == Input.Keys.SPACE) {
+        if (keyCode == Input.Keys.SPACE && !car.shouldDie) {
             val bulletHeight = 3f
             // We want the start position to start at the front of the car and additional with the half height of the bullet to not collied with the
             // shooting car.
             bullets.add(Bullet(world, getNosePosition(car.getBody(), (car.getHeight() / 2) + 1 + (bulletHeight / 2)), Vector2(1f, bulletHeight), car.getAngle()))
         }
+        if (keyCode == Input.Keys.Q && !car2.shouldDie) {
+            val bulletHeight = 3f
+            // We want the start position to start at the front of the car and additional with the half height of the bullet to not collied with the
+            // shooting car.
+            bullets.add(Bullet(world, getNosePosition(car2.getBody(), (car2.getHeight() / 2) + 1 + (bulletHeight / 2)), Vector2(1f, bulletHeight), car2.getAngle()))
+        }
     }
 
     override fun onUserKeyUp(keyCode: Int) {
-        System.out.println("User released a key! " + keyCode)
+        System.out.println("User released a key! $keyCode")
         pressedControlStates.remove(controlStateFromKeyCode(keyCode))
+        pressedControlStatesForCar2.remove(controlStateFromKeyCodeForTest(keyCode))
     }
 
     private lateinit var polygonSpriteBatch: PolygonSpriteBatch
@@ -56,6 +68,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     private lateinit var debugRenderer: Box2DDebugRenderer
     private lateinit var camera: OrthographicCamera
     private lateinit var pressedControlStates: HashSet<Tire.TireControlState>
+    private lateinit var pressedControlStatesForCar2: HashSet<Tire.TireControlState>
     private lateinit var walls: ArrayList<Wall>
     private lateinit var bullets: ArrayList<Bullet>
 
@@ -75,6 +88,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         debugRenderer = Box2DDebugRenderer()
         camera = OrthographicCamera(mapWidth,mapHeight)
         pressedControlStates = HashSet()
+        pressedControlStatesForCar2 = HashSet()
         walls = ArrayList()
         walls.add(Wall(world, Vector2(-mapWidth/2 + (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))
         walls.add(Wall(world, Vector2(0f,-mapHeight/2 + wallThickness/2), Vector2(mapWidth, wallThickness)))
@@ -99,10 +113,20 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
                 val objectA = contact?.fixtureA?.body?.userData as? Bullet
                 if(objectA != null) {
                     objectA.shouldDie = true
+                    val carB = contact?.fixtureB?.body?.userData as? Car
+                    if(carB != null) {
+                        carB.shouldDie = true
+                        System.out.println("Car hit!")
+                    }
                 }
                 val objectB = contact?.fixtureB?.body?.userData as? Bullet
                 if(objectB != null) {
                     objectB.shouldDie = true
+                    val carA = contact?.fixtureA?.body?.userData as? Car
+                    if(carA != null) {
+                        carA.shouldDie = true
+                        System.out.println("Car hit!")
+                    }
                 }
             }
         })
@@ -136,13 +160,14 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         }
         polygonSpriteBatch.end()
         // Uncomment to show hit boxes.
-        debugRenderer.render(world, camera.combined)
+        //debugRenderer.render(world, camera.combined)
 
         car.update(pressedControlStates)
+        car2.update(pressedControlStatesForCar2)
         world.step(1/20f,5, 5)
         val emptyHashSet = HashSet<Tire.TireControlState>()
-        car2.update(emptyHashSet)
-        car2.update(emptyHashSet)
+
+        car3.update(emptyHashSet)
     }
 
     override fun dispose() {
@@ -156,6 +181,18 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
             Input.Keys.DOWN -> return Tire.TireControlState.DOWN
             Input.Keys.LEFT -> return Tire.TireControlState.LEFT
             Input.Keys.RIGHT -> return Tire.TireControlState.RIGHT
+            else -> {} // Don't handle.
+        }
+
+        return null
+    }
+
+    private fun controlStateFromKeyCodeForTest(keyCode: Int): Tire.TireControlState? {
+        when(keyCode) {
+            Input.Keys.W -> return Tire.TireControlState.UP
+            Input.Keys.S -> return Tire.TireControlState.DOWN
+            Input.Keys.A -> return Tire.TireControlState.LEFT
+            Input.Keys.D -> return Tire.TireControlState.RIGHT
             else -> {} // Don't handle.
         }
 

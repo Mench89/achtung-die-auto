@@ -102,7 +102,6 @@ class Tire(world: World) {
         val currentForwardNormal = getForwardVelocity()
         // TODO: Is this the same as normilzed?
         val currentForwardSpeed = currentForwardNormal.len()
-        System.out.println("Speed: " + currentForwardSpeed)
         /// TODO: Konstant?
         var dragForceMagnitude = currentForwardSpeed * -0.25f
         dragForceMagnitude *= currentDrag

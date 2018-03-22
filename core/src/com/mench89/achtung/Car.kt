@@ -20,6 +20,11 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef
 class Car(world: World, color: Color, position: Vector2) {
     constructor(world: World) : this(world, Color(1f, 0f, 0f, 1f), Vector2(10f, 10f))
 
+    /**
+     * Should be set true when this bullet object should be destroyed in next draw()-call.
+     */
+    var shouldDie = false
+
     private var body: Body
     private var tires: ArrayList<Tire>
     private var frontLeftTireJoint: RevoluteJoint
@@ -37,6 +42,7 @@ class Car(world: World, color: Color, position: Vector2) {
         bodyDef.position.set(position)
         bodyDef.type = BodyDef.BodyType.DynamicBody
         body = world.createBody(bodyDef)
+        body.userData = this
         // TODO: Need tweak?
         body.angularDamping = 3f
 
@@ -120,6 +126,10 @@ class Car(world: World, color: Color, position: Vector2) {
     }
 
     fun update(controlStates: HashSet<Tire.TireControlState>) {
+        // If the car is dead then no input should be handled.
+        if(shouldDie) {
+            controlStates.clear()
+        }
         for (tire in tires) {
             tire.updateFiction()
         }
@@ -162,6 +172,13 @@ class Car(world: World, color: Color, position: Vector2) {
     }
 
     /**
+     * Call when this car is hit by or damaged.
+     */
+    fun hit() {
+        shouldDie = true
+    }
+
+    /**
      * Get the position at the front of the car.
      */
     fun getNosePosition(): Vector2 {
@@ -178,6 +195,9 @@ class Car(world: World, color: Color, position: Vector2) {
 
     fun  draw(polySpriteBatch: PolygonSpriteBatch) {
         polygonSprite.setPosition(body.position.x, body.position.y)
+        if(shouldDie) {
+            polygonSprite.color = Color.GRAY
+        }
         polygonSprite.rotation = body.angle * WorldConstants.RADTODEG
         polygonSprite.draw(polySpriteBatch)
         for (tire in tires) {

@@ -18,7 +18,6 @@ import com.badlogic.gdx.physics.box2d.*
 // TODO: Add gravitation? Stop the car to be completely still.
 // TODO: Tweak steering, feels a little "slow"
 // TODO: Start position bug, wheels and car are rotating/spinning the first couple of frames.
-// TODO: Add restart function for debugging
 // TODO: UI for showing score
 // TODO: Audio
 // TODO: Scoreboard UI
@@ -72,10 +71,13 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     private lateinit var pressedControlStatesForCar2: HashSet<Tire.TireControlState>
     private lateinit var walls: ArrayList<Wall>
     private lateinit var bullets: ArrayList<Bullet>
+    private var timeLastUpdate = 0L
+    private var dtSinceLastUpdate = 0L
 
     private val mapWidth = 100f
     private val mapHeight = 100f
     private val wallThickness = 2f
+    private val dtLimit = 1f/60f
 
     override fun create() {
         initWorld()
@@ -92,6 +94,8 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     private fun initWorld() {
+        timeLastUpdate = 0L
+        dtSinceLastUpdate = 0L
         world = World(Vector2(0f, 0f), true)
         car = Car(world)
         car2 = Car(world, Color(1f, 1f, 0f, 1f),  Vector2(40f, 20f))
@@ -142,6 +146,19 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     override fun render() {
+        if(timeLastUpdate == 0L) {
+            timeLastUpdate = System.currentTimeMillis()
+        }
+        dtSinceLastUpdate += System.currentTimeMillis() - timeLastUpdate
+        if(dtSinceLastUpdate < (dtLimit * 1000).toLong()) {
+            System.out.println("Skipping rendering!")
+            return
+        }
+
+        // Update time variables with new times since this will be a rendered frame
+        dtSinceLastUpdate -= (dtLimit * 1000).toLong()
+        timeLastUpdate = System.currentTimeMillis()
+
         polygonSpriteBatch.projectionMatrix = camera.combined
 
         Gdx.gl.glClearColor(0f, 0.5f, 0.5f, 1f)
@@ -172,7 +189,7 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
 
         car.update(pressedControlStates)
         car2.update(pressedControlStatesForCar2)
-        world.step(1/20f,5, 5)
+        world.step(dtLimit,5, 5)
         val emptyHashSet = HashSet<Tire.TireControlState>()
 
         car3.update(emptyHashSet)

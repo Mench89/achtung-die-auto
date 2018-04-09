@@ -17,6 +17,7 @@ class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
      */
     var shouldDie = false
 
+    private val bulletVelocity = 500f
     private val sprite: Sprite
     private val body: Body
 
@@ -33,7 +34,7 @@ class Bullet(world: World, position: Vector2, size: Vector2, angle: Float) {
         body.userData = this
 
         val currentForwardNormal = Vector2(body.getWorldVector(Vector2(0f, 1f)))
-        body.applyLinearImpulse(currentForwardNormal.scl(200f), body.worldCenter, true)
+        body.applyLinearImpulse(currentForwardNormal.scl(bulletVelocity), body.worldCenter, true)
 
         // Create the sprite
         val pix = Pixmap(1, 1, Pixmap.Format.RGBA8888);

@@ -23,10 +23,10 @@ class Tire(world: World) {
     private var currentTraction: Float
     private var currentDrag: Float
 
-    private var maxForwardSpeed = 250f
+    private var maxForwardSpeed = 500f
     private var maxBackwardSpeed = -40f
-    private var maxDriveForce = 500f
-    private var maxLateralImpulse = 8.5f
+    private var maxDriveForce = 750f
+    private var maxLateralImpulse = 12.5f
 
     private val texture: Texture
     private val sprite: Sprite

@@ -78,12 +78,12 @@ class Car(world: World, color: Color, position: Vector2) {
         jointDef.upperAngle = 0f
         jointDef.localAnchorB.setZero() // Center of tire
 
-        val maxForwardSpeed = 250f
-        val maxBackwardSpeed = -40f
-        val backTireMaxDriveForce = 300f
-        val frontTireMaxDriveForce = 500f
-        val backTireMaxLateralImpulse = 8.5f
-        val frontTireMaxLateralImpulse = 7.5f
+        val maxForwardSpeed = 500f
+        val maxBackwardSpeed = -80f
+        val backTireMaxDriveForce = 600f
+        val frontTireMaxDriveForce = 1000f
+        val backTireMaxLateralImpulse = 12f
+        val frontTireMaxLateralImpulse = 10f
 
         tires = ArrayList()
 

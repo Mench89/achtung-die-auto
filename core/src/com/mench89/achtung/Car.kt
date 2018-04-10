@@ -138,8 +138,8 @@ class Car(world: World, color: Color, position: Vector2) {
         }
 
         // Control steering
-        val lockAngle = 35 * WorldConstants.DEGTORAD
-        val turnSpeedPerSec = 160 * WorldConstants.DEGTORAD //from lock to lock in 0.5 sec
+        val lockAngle = 40 * WorldConstants.DEGTORAD
+        val turnSpeedPerSec = 180 * WorldConstants.DEGTORAD
         val turnPerTimeStep = turnSpeedPerSec / 60.0f
         var desiredAngle = 0f
 

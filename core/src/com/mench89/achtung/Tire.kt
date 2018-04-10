@@ -56,7 +56,7 @@ class Tire(world: World) {
 
         body.userData = this
 
-        currentTraction = 1f
+        currentTraction = 2f
         currentDrag = 1f
     }
 
@@ -169,20 +169,4 @@ class Tire(world: World) {
         sprite.rotation = body.angle * WorldConstants.RADTODEG
         sprite.draw(polySpriteBatch)
     }
-
-
-    /*
-    fun updateTurn(controlState: TireControlState) {
-        var desiredTorque = 0f
-        when (controlState) {
-            // TODO: Använd +=? Vad händer annars om man håller inne båda?
-            TireControlState.LEFT -> desiredTorque = 15f
-            TireControlState.RIGHT -> desiredTorque = -15f
-            else -> {} // Do noting.
-        }
-        body.applyTorque(desiredTorque, true)
-    }
-    */
-
-
 }

@@ -16,16 +16,16 @@ import com.badlogic.gdx.physics.box2d.*
 // TODO: Map
 // TODO: Handbrake support.
 // TODO: Add gravitation? Stop the car to be completely still.
-// TODO: Tweak steering, feels a little "slow"
 // TODO: Start position bug, wheels and car are rotating/spinning the first couple of frames.
 // TODO: UI for showing score
 // TODO: Audio
 // TODO: Scoreboard UI
 // TODO: Multiplayer
+// TODO: Powerups
+// TODO: HP UI
 
 class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     override fun onUserKeyDown(keyCode: Int) {
-        System.out.println("User pressed a key! " + keyCode)
         var controlState = controlStateFromKeyCode(keyCode)
         if (controlState != null) {
             pressedControlStates.add(controlState)
@@ -54,7 +54,6 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     }
 
     override fun onUserKeyUp(keyCode: Int) {
-        System.out.println("User released a key! $keyCode")
         pressedControlStates.remove(controlStateFromKeyCode(keyCode))
         pressedControlStatesForCar2.remove(controlStateFromKeyCodeForTest(keyCode))
     }
@@ -74,8 +73,8 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
     private var timeLastUpdate = 0L
     private var dtSinceLastUpdate = 0L
 
-    private val mapWidth = 100f
-    private val mapHeight = 100f
+    private val mapWidth = 200f
+    private val mapHeight = 200f
     private val wallThickness = 2f
     private val dtLimit = 1f/60f
 
@@ -102,11 +101,17 @@ class AchtungGame : ApplicationAdapter(), InputHandler.MovementListener {
         car3 = Car(world, Color(1f, 0f, 1f, 1f), Vector2(-30f, -25f))
         pressedControlStates = HashSet()
         pressedControlStatesForCar2 = HashSet()
+
         walls = ArrayList()
+        // Side walls
         walls.add(Wall(world, Vector2(-mapWidth/2 + (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))
         walls.add(Wall(world, Vector2(0f,-mapHeight/2 + wallThickness/2), Vector2(mapWidth, wallThickness)))
         walls.add(Wall(world, Vector2(+mapWidth/2 - (wallThickness / 2),0f), Vector2(wallThickness, mapHeight)))
         walls.add(Wall(world, Vector2(0f,mapHeight/2 -wallThickness/2), Vector2(mapWidth, wallThickness)))
+        // Middle cross
+        walls.add(Wall(world, Vector2(-wallThickness / 2,0f), Vector2(wallThickness, mapHeight/1.75f)))
+        walls.add(Wall(world, Vector2(-wallThickness / 2,0f), Vector2(mapWidth/1.75f, wallThickness)))
+
         bullets = ArrayList()
 
         world.setContactListener(object : ContactListener {
